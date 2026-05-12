@@ -1,0 +1,15 @@
+; Configuracao mantida apenas como referencia.
+; O ERP Vendas agora grava estes dados no banco pela tela:
+;   Dados Email Pedido
+;
+; Campos equivalentes:
+; Host=smtp.seudominio.com
+; Port=587
+; UserName=usuario@seudominio.com
+; Password=sua_senha
+; FromEmail=usuario@seudominio.com
+; FromName=ERP Vendas
+; A configuracao ativa fica na tela "Dados Email Pedido".
+; Modos usuais:
+; - Porta 587: STARTTLS
+; - Porta 465: SSL/TLS implicito

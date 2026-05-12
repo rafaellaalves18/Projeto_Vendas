@@ -1,0 +1,117 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{A0BF2E52-301D-47C2-99A4-EC085A238CE0}</ProjectGuid>
+        <ProjectVersion>19.5</ProjectVersion>
+        <FrameworkType>VCL</FrameworkType>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Application</AppType>
+        <MainSource>ERPVendas.dpr</MainSource>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''"><Base>true</Base></PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32><CfgParent>Base</CfgParent><Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1><CfgParent>Base</CfgParent><Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32><CfgParent>Cfg_1</CfgParent><Cfg_1>true</Cfg_1><Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2><CfgParent>Base</CfgParent><Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32><CfgParent>Cfg_2</CfgParent><Cfg_2>true</Cfg_2><Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_UnitSearchPath>src\Presentation;src\Presentation\Clientes;src\Presentation\Produtos;src\Presentation\Pedidos;src\Presentation\Configuracoes;src\Presentation\Relatorios;src\Application\Services;src\Application\Interfaces;src\Core\Entities;src\Core\Exceptions;src\Infrastructure\Persistence\Connection;src\Infrastructure\Persistence\Schema;src\Infrastructure\Persistence\Repositories;src\Infrastructure\Integration;src\Infrastructure\Messaging;src\Infrastructure\Mail;..\Shared\src\Application\Contracts;..\Shared\src\Infrastructure\Messaging;..\Shared\src\Core;..\Shared\src\Presentation\Security;$(BDS)\RBuilder\Lib\$(Platform);$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
+        <SanitizedProjectName>ERPVendas</SanitizedProjectName>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.projetovendas.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1046</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="src\Presentation\Frm.Principal.Vendas.pas"><Form>frmPrincipalVendas</Form></DCCReference>
+        <DCCReference Include="src\Presentation\Clientes\Frm.Cadastro.Cliente.pas"><Form>frmCadastroCliente</Form></DCCReference>
+        <DCCReference Include="src\Presentation\Produtos\Frm.Cadastro.Produto.pas"><Form>frmCadastroProduto</Form></DCCReference>
+        <DCCReference Include="src\Presentation\Pedidos\Frm.Pedido.Venda.pas"><Form>frmPedidoVenda</Form></DCCReference>
+        <DCCReference Include="src\Presentation\Configuracoes\Frm.Dados.Email.Pedido.pas"><Form>frmDadosEmailPedido</Form></DCCReference>
+        <DCCReference Include="src\Presentation\Relatorios\Frm.Relatorio.PedidoConfirmacao.pas"/>
+        <DCCReference Include="src\Presentation\Relatorios\Frm.Relatorio.PedidosPeriodo.pas"><Form>frmRelatorioPedidosPeriodo</Form></DCCReference>
+        <DCCReference Include="src\Application\Services\Vendas.Application.Services.PedidoVenda.pas"/>
+        <DCCReference Include="src\Application\Services\Vendas.Application.Services.EnvioRelatorioQuitacao.pas"/>
+        <DCCReference Include="src\Application\Interfaces\Vendas.Application.Interfaces.Repositories.pas"/>
+        <DCCReference Include="src\Core\Entities\Vendas.Core.Entities.Cliente.pas"/>
+        <DCCReference Include="src\Core\Entities\Vendas.Core.Entities.Produto.pas"/>
+        <DCCReference Include="src\Core\Entities\Vendas.Core.Entities.PedidoVenda.pas"/>
+        <DCCReference Include="src\Core\Exceptions\Vendas.Core.Exceptions.pas"/>
+        <DCCReference Include="src\Infrastructure\Persistence\Connection\Vendas.Infrastructure.Persistence.DMConexao.pas"><Form>dmConexaoVendas</Form><DesignClass>TDataModule</DesignClass></DCCReference>
+        <DCCReference Include="src\Infrastructure\Persistence\Connection\Vendas.Infrastructure.Persistence.Conexao.pas"/>
+        <DCCReference Include="src\Infrastructure\Persistence\Schema\Vendas.Infrastructure.Persistence.DatabaseSchema.pas"/>
+        <DCCReference Include="src\Infrastructure\Persistence\Repositories\Vendas.Infrastructure.Persistence.Repositories.Cliente.pas"/>
+        <DCCReference Include="src\Infrastructure\Persistence\Repositories\Vendas.Infrastructure.Persistence.Repositories.Produto.pas"/>
+        <DCCReference Include="src\Infrastructure\Persistence\Repositories\Vendas.Infrastructure.Persistence.Repositories.PedidoVenda.pas"/>
+        <DCCReference Include="src\Infrastructure\Integration\Vendas.Infrastructure.Integration.FinanceiroGateway.pas"/>
+        <DCCReference Include="src\Infrastructure\Messaging\Vendas.Infrastructure.Messaging.ContaRecebidaConsumer.pas"/>
+        <DCCReference Include="src\Infrastructure\Mail\Vendas.Infrastructure.Mail.SmtpClient.pas"/>
+        <DCCReference Include="..\Shared\src\Application\Contracts\Shared.Application.Contracts.Financeiro.pas"/>
+        <DCCReference Include="..\Shared\src\Infrastructure\Messaging\Shared.Infrastructure.Messaging.RabbitMQ.pas"/>
+        <DCCReference Include="..\Shared\src\Core\Shared.Core.Types.pas"/>
+        <DCCReference Include="..\Shared\src\Core\Shared.Core.Security.Auth.pas"/>
+        <DCCReference Include="..\Shared\src\Presentation\Security\Shared.Presentation.Security.Login.pas"/>
+        <DCCReference Include="..\Shared\src\Presentation\Security\Shared.Presentation.Security.AdminRecovery.pas"/>
+        <DCCReference Include="..\Shared\src\Presentation\Security\Shared.Presentation.Security.UsuarioUnlock.pas"/>
+        <BuildConfiguration Include="Base"><Key>Base</Key></BuildConfiguration>
+        <BuildConfiguration Include="Debug"><Key>Cfg_1</Key><CfgParent>Base</CfgParent></BuildConfiguration>
+        <BuildConfiguration Include="Release"><Key>Cfg_2</Key><CfgParent>Base</CfgParent></BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Application</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source><Source Name="MainSource">ERPVendas.dpr</Source></Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+    <Target Name="AfterBuild">
+        <Copy SourceFiles="$(MSBuildProjectDirectory)\lib\openssl\x86\libeay32.dll;$(MSBuildProjectDirectory)\lib\openssl\x86\ssleay32.dll" DestinationFolder="$(MSBuildProjectDirectory)\$(DCC_ExeOutput)" SkipUnchangedFiles="true"/>
+    </Target>
+</Project>
