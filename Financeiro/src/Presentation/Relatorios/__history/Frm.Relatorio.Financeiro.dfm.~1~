@@ -1,0 +1,1007 @@
+object frmRelatorioFinanceiro: TfrmRelatorioFinanceiro
+  Left = 0
+  Top = 0
+  Caption = 'Relatorio Financeiro'
+  ClientHeight = 310
+  ClientWidth = 820
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  Position = poScreenCenter
+  TextHeight = 15
+  object FPnlTitulo: TPanel
+    Left = 0
+    Top = 0
+    Width = 820
+    Height = 58
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 0
+    object FLblTitulo: TLabel
+      Left = 24
+      Top = 16
+      Width = 157
+      Height = 21
+      Caption = 'Relatorio Financeiro'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+  end
+  object FPnlFiltros: TPanel
+    Left = 0
+    Top = 58
+    Width = 820
+    Height = 130
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 1
+    object FLblDataInicial: TLabel
+      Left = 24
+      Top = 8
+      Width = 59
+      Height = 15
+      Caption = 'Data inicial'
+    end
+    object FLblDataFinal: TLabel
+      Left = 160
+      Top = 8
+      Width = 50
+      Height = 15
+      Caption = 'Data final'
+    end
+    object FLblTipoData: TLabel
+      Left = 296
+      Top = 8
+      Width = 49
+      Height = 15
+      Caption = 'Filtrar por'
+    end
+    object FLblStatus: TLabel
+      Left = 456
+      Top = 8
+      Width = 35
+      Height = 15
+      Caption = 'Status'
+    end
+    object FLblCliente: TLabel
+      Left = 24
+      Top = 70
+      Width = 39
+      Height = 15
+      Caption = 'Cliente'
+    end
+    object FDtpInicial: TDateTimePicker
+      Left = 24
+      Top = 28
+      Width = 120
+      Height = 23
+      Date = 45000.000000000000000000
+      Time = 0.000000000000000000
+      TabOrder = 0
+    end
+    object FDtpFinal: TDateTimePicker
+      Left = 160
+      Top = 28
+      Width = 120
+      Height = 23
+      Date = 45000.000000000000000000
+      Time = 0.000000000000000000
+      TabOrder = 1
+    end
+    object FCbxTipoData: TComboBox
+      Left = 296
+      Top = 28
+      Width = 140
+      Height = 23
+      Style = csDropDownList
+      ItemIndex = 0
+      TabOrder = 2
+      Text = 'Vencimento'
+      Items.Strings = (
+        'Vencimento'
+        'Emissao')
+    end
+    object FCbxStatus: TComboBox
+      Left = 456
+      Top = 28
+      Width = 140
+      Height = 23
+      Style = csDropDownList
+      ItemIndex = 0
+      TabOrder = 3
+      Text = 'Todos'
+      Items.Strings = (
+        'Todos'
+        'Abertos'
+        'Fechados'
+        'Cancelados')
+    end
+    object FEdtCodCliente: TEdit
+      Left = 24
+      Top = 90
+      Width = 72
+      Height = 23
+      TabOrder = 4
+      OnKeyPress = edtCodClienteKeyPress
+    end
+    object FEdtNomeCliente: TEdit
+      Left = 104
+      Top = 90
+      Width = 492
+      Height = 23
+      TabOrder = 5
+      OnKeyPress = edtNomeClienteKeyPress
+    end
+  end
+  object FPnlBotoes: TPanel
+    Left = 0
+    Top = 188
+    Width = 820
+    Height = 54
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 2
+    object FBtnVisualizar: TButton
+      Left = 24
+      Top = 12
+      Width = 120
+      Height = 28
+      Caption = 'Visualizar'
+      Default = True
+      TabOrder = 0
+      OnClick = btnVisualizarClick
+    end
+    object FBtnSair: TButton
+      Left = 152
+      Top = 12
+      Width = 120
+      Height = 28
+      Cancel = True
+      Caption = 'Sair'
+      TabOrder = 1
+      OnClick = btnSairClick
+    end
+  end
+  object FConexaoFinanceiro: TFDConnection
+    Params.Strings = (
+      'DriverID=FB'
+      'Server=localhost'
+      'Port=3050'
+      'Database=C:\Projeto_Vendas\data\ERP_FINANCEIRO.FDB'
+      'User_Name=SYSDBA'
+      'Password=masterkey'
+      'CharacterSet=UTF8'
+      'Protocol=TCPIP')
+    LoginPrompt = False
+    BeforeConnect = FConexaoFinanceiroBeforeConnect
+    Left = 32
+    Top = 256
+  end
+  object FQryFinanceiro: TFDQuery
+    Connection = FConexaoFinanceiro
+    SQL.Strings = (
+      'select cr.id_conta_receber, cr.id_origem, cr.id_cliente,'
+      '       cr.nome_cliente, cr.data_emissao, cr.data_vencimento,'
+      '       cr.valor as valor_financeiro, cr.status,'
+      '       case cr.status'
+      '         when ''ABERTA'' then ''Aberta'''
+      '         when ''RECEBIDA'' then ''Fechada'''
+      '         when ''CANCELADA'' then ''Cancelada'''
+      '         else cr.status'
+      '       end as status_descricao'
+      'from contas_receber cr'
+      'where 1 = 0'
+      'order by cr.data_vencimento, cr.id_conta_receber')
+    Left = 136
+    Top = 256
+  end
+  object FQryResumo: TFDQuery
+    Connection = FConexaoFinanceiro
+    SQL.Strings = (
+      'select count(*) as qtd_contas,'
+      '       coalesce(sum(cr.valor), 0) as valor_total,'
+      '       coalesce(sum(case when cr.status = ''ABERTA'' then cr.valor else 0 end), 0) as valor_aberto,'
+      '       coalesce(sum(case when cr.status = ''RECEBIDA'' then cr.valor else 0 end), 0) as valor_fechado,'
+      '       coalesce(sum(case when cr.status = ''CANCELADA'' then cr.valor else 0 end), 0) as valor_cancelado'
+      'from contas_receber cr'
+      'where 1 = 0')
+    Left = 136
+    Top = 304
+  end
+  object FDSFinanceiro: TDataSource
+    DataSet = FQryFinanceiro
+    Left = 248
+    Top = 256
+  end
+  object FDSResumo: TDataSource
+    DataSet = FQryResumo
+    Left = 248
+    Top = 304
+  end
+  object FPipeFinanceiro: TppDBPipeline
+    DataSource = FDSFinanceiro
+    UserName = 'Financeiro'
+    Left = 360
+    Top = 256
+  end
+  object FPipeResumo: TppDBPipeline
+    DataSource = FDSResumo
+    UserName = 'Resumo'
+    Left = 360
+    Top = 304
+  end
+  object FReport: TppReport
+    AutoStop = False
+    DataPipeline = FPipeFinanceiro
+    PassSetting = psTwoPass
+    Units = utMillimeters
+    PrinterSetup.DocumentName = 'Relatorio Financeiro'
+    PrinterSetup.MarginBottom = 6.350000000000000000
+    PrinterSetup.MarginLeft = 6.350000000000000000
+    PrinterSetup.MarginRight = 6.350000000000000000
+    PrinterSetup.MarginTop = 6.350000000000000000
+    PrinterSetup.PaperHeight = 210.000000000000000000
+    PrinterSetup.PaperWidth = 297.000000000000000000
+    PrinterSetup.Orientation = poLandscape
+    PrinterSetup.PaperName = 'A4'
+    DeviceType = 'Screen'
+    ColumnWidth = 284.300000000000000000
+    Left = 488
+    Top = 256
+    object ppTitleBandFinanceiro: TppTitleBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 39370
+      mmPrintPosition = 0
+      object ppShapeTituloFinanceiro: TppShape
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppShapeTituloFinanceiro'
+        Brush.Color = 15921906
+        Brush.Style = bsSolid
+        Pen.Color = 12105912
+        mmHeight = 14224
+        mmLeft = 0
+        mmTop = 0
+        mmWidth = 267970
+        BandType = 1
+        LayerName = Foreground
+      end
+      object ppLblEmpresaFinanceiro: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblEmpresaFinanceiro'
+        Caption = 'ERP Financeiro'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Name = 'Arial'
+        Font.Size = 12
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 4572
+        mmLeft = 3810
+        mmTop = 2540
+        mmWidth = 41910
+        BandType = 1
+        LayerName = Foreground
+      end
+      object ppLblTituloRelFinanceiro: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblTituloRelFinanceiro'
+        Caption = 'Relatorio Financeiro'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Name = 'Arial'
+        Font.Size = 13
+        Font.Style = [fsBold]
+        TextAlignment = taCentered
+        Transparent = True
+        mmHeight = 5588
+        mmLeft = 83820
+        mmTop = 2540
+        mmWidth = 96520
+        BandType = 1
+        LayerName = Foreground
+      end
+      object ppLblSubTituloRelFinanceiro: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblSubTituloRelFinanceiro'
+        Caption = 'Contas a receber por periodo'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGray
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = []
+        TextAlignment = taCentered
+        Transparent = True
+        mmHeight = 3302
+        mmLeft = 83820
+        mmTop = 8890
+        mmWidth = 96520
+        BandType = 1
+        LayerName = Foreground
+      end
+      object FLblFiltroPeriodo: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'FLblFiltroPeriodo'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3556
+        mmLeft = 2540
+        mmTop = 18288
+        mmWidth = 172720
+        BandType = 1
+        LayerName = Foreground
+      end
+      object FLblFiltroCliente: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'FLblFiltroCliente'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3556
+        mmLeft = 2540
+        mmTop = 23876
+        mmWidth = 172720
+        BandType = 1
+        LayerName = Foreground
+      end
+      object FLblFiltroStatus: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'FLblFiltroStatus'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3556
+        mmLeft = 2540
+        mmTop = 29464
+        mmWidth = 172720
+        BandType = 1
+        LayerName = Foreground
+      end
+    end
+    object ppHeaderBandFinanceiro: TppHeaderBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 9144
+      mmPrintPosition = 0
+      object ppShapeHeaderFinanceiro: TppShape
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppShapeHeaderFinanceiro'
+        Brush.Color = 15921906
+        Brush.Style = bsSolid
+        Pen.Color = 12105912
+        mmHeight = 7112
+        mmLeft = 0
+        mmTop = 508
+        mmWidth = 267970
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLblHeaderConta: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblHeaderConta'
+        Caption = 'Conta'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3302
+        mmLeft = 2540
+        mmTop = 2540
+        mmWidth = 13970
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLblHeaderVenda: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblHeaderVenda'
+        Caption = 'Venda'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3302
+        mmLeft = 19812
+        mmTop = 2540
+        mmWidth = 13970
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLblHeaderEmissao: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblHeaderEmissao'
+        Caption = 'Emissao'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3302
+        mmLeft = 37592
+        mmTop = 2540
+        mmWidth = 17780
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLblHeaderVencimento: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblHeaderVencimento'
+        Caption = 'Vencimento'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3302
+        mmLeft = 59436
+        mmTop = 2540
+        mmWidth = 21590
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLblHeaderCodCliente: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblHeaderCodCliente'
+        Caption = 'Cod. cliente'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3302
+        mmLeft = 84836
+        mmTop = 2540
+        mmWidth = 19050
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLblHeaderCliente: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblHeaderCliente'
+        Caption = 'Nome cliente'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3302
+        mmLeft = 106680
+        mmTop = 2540
+        mmWidth = 66040
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLblHeaderStatus: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblHeaderStatus'
+        Caption = 'Status'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3302
+        mmLeft = 177800
+        mmTop = 2540
+        mmWidth = 20320
+        BandType = 0
+        LayerName = Foreground
+      end
+      object ppLblHeaderValor: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblHeaderValor'
+        Caption = 'Valor financeiro'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        mmHeight = 3302
+        mmLeft = 205740
+        mmTop = 2540
+        mmWidth = 31750
+        BandType = 0
+        LayerName = Foreground
+      end
+    end
+    object ppDetailBandFinanceiro: TppDetailBand
+      Background1.Brush.Style = bsClear
+      Background2.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 7112
+      mmPrintPosition = 0
+      object dbContaId: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbContaId'
+        DataField = 'ID_CONTA_RECEBER'
+        DataPipeline = FPipeFinanceiro
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'Financeiro'
+        mmHeight = 3556
+        mmLeft = 2540
+        mmTop = 1524
+        mmWidth = 13970
+        BandType = 4
+        LayerName = Foreground
+      end
+      object dbVendaId: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbVendaId'
+        DataField = 'ID_ORIGEM'
+        DataPipeline = FPipeFinanceiro
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'Financeiro'
+        mmHeight = 3556
+        mmLeft = 19812
+        mmTop = 1524
+        mmWidth = 13970
+        BandType = 4
+        LayerName = Foreground
+      end
+      object dbEmissao: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbEmissao'
+        DataField = 'DATA_EMISSAO'
+        DataPipeline = FPipeFinanceiro
+        DisplayFormat = 'dd/mm/yyyy'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'Financeiro'
+        mmHeight = 3556
+        mmLeft = 37592
+        mmTop = 1524
+        mmWidth = 17780
+        BandType = 4
+        LayerName = Foreground
+      end
+      object dbVencimento: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbVencimento'
+        DataField = 'DATA_VENCIMENTO'
+        DataPipeline = FPipeFinanceiro
+        DisplayFormat = 'dd/mm/yyyy'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'Financeiro'
+        mmHeight = 3556
+        mmLeft = 59436
+        mmTop = 1524
+        mmWidth = 21590
+        BandType = 4
+        LayerName = Foreground
+      end
+      object dbCodCliente: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbCodCliente'
+        DataField = 'ID_CLIENTE'
+        DataPipeline = FPipeFinanceiro
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'Financeiro'
+        mmHeight = 3556
+        mmLeft = 84836
+        mmTop = 1524
+        mmWidth = 19050
+        BandType = 4
+        LayerName = Foreground
+      end
+      object dbCliente: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbCliente'
+        DataField = 'NOME_CLIENTE'
+        DataPipeline = FPipeFinanceiro
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'Financeiro'
+        mmHeight = 3556
+        mmLeft = 106680
+        mmTop = 1524
+        mmWidth = 66040
+        BandType = 4
+        LayerName = Foreground
+      end
+      object dbStatus: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbStatus'
+        DataField = 'STATUS_DESCRICAO'
+        DataPipeline = FPipeFinanceiro
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'Financeiro'
+        mmHeight = 3556
+        mmLeft = 177800
+        mmTop = 1524
+        mmWidth = 20320
+        BandType = 4
+        LayerName = Foreground
+      end
+      object dbValor: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbValor'
+        DataField = 'VALOR_FINANCEIRO'
+        DataPipeline = FPipeFinanceiro
+        DisplayFormat = '#,##0.00;-#,##0.00'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = []
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'Financeiro'
+        mmHeight = 3556
+        mmLeft = 205740
+        mmTop = 1524
+        mmWidth = 31750
+        BandType = 4
+        LayerName = Foreground
+      end
+      object ppLineDetailFinanceiro: TppLine
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLineDetailFinanceiro'
+        Pen.Color = 14737632
+        mmHeight = 0
+        mmLeft = 0
+        mmTop = 6604
+        mmWidth = 267970
+        BandType = 4
+        LayerName = Foreground
+      end
+    end
+    object ppSummaryBandFinanceiro: TppSummaryBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 23368
+      mmPrintPosition = 0
+      object ppLineSummaryFinanceiro: TppLine
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLineSummaryFinanceiro'
+        Pen.Color = 12105912
+        mmHeight = 0
+        mmLeft = 0
+        mmTop = 2540
+        mmWidth = 267970
+        BandType = 7
+        LayerName = Foreground
+      end
+      object ppShapeSummaryFinanceiro: TppShape
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppShapeSummaryFinanceiro'
+        Brush.Color = 15921906
+        Brush.Style = bsSolid
+        Pen.Color = 12105912
+        mmHeight = 10668
+        mmLeft = 30480
+        mmTop = 6096
+        mmWidth = 237490
+        BandType = 7
+        LayerName = Foreground
+      end
+      object ppLblResumoContas: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblResumoContas'
+        Caption = 'Contas'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3048
+        mmLeft = 35560
+        mmTop = 9652
+        mmWidth = 13970
+        BandType = 7
+        LayerName = Foreground
+      end
+      object dbQtdContas: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbQtdContas'
+        DataField = 'QTD_CONTAS'
+        DataPipeline = FPipeResumo
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'Resumo'
+        mmHeight = 3810
+        mmLeft = 50292
+        mmTop = 9144
+        mmWidth = 11430
+        BandType = 7
+        LayerName = Foreground
+      end
+      object ppLblResumoAberto: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblResumoAberto'
+        Caption = 'Aberto'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3048
+        mmLeft = 68580
+        mmTop = 9652
+        mmWidth = 13970
+        BandType = 7
+        LayerName = Foreground
+      end
+      object dbValorAberto: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbValorAberto'
+        DataField = 'VALOR_ABERTO'
+        DataPipeline = FPipeResumo
+        DisplayFormat = '#,##0.00;-#,##0.00'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'Resumo'
+        mmHeight = 4572
+        mmLeft = 83820
+        mmTop = 8636
+        mmWidth = 26670
+        BandType = 7
+        LayerName = Foreground
+      end
+      object ppLblResumoFechado: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblResumoFechado'
+        Caption = 'Fechado'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3048
+        mmLeft = 119380
+        mmTop = 9652
+        mmWidth = 16510
+        BandType = 7
+        LayerName = Foreground
+      end
+      object dbValorFechado: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbValorFechado'
+        DataField = 'VALOR_FECHADO'
+        DataPipeline = FPipeResumo
+        DisplayFormat = '#,##0.00;-#,##0.00'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'Resumo'
+        mmHeight = 4572
+        mmLeft = 137160
+        mmTop = 8636
+        mmWidth = 26670
+        BandType = 7
+        LayerName = Foreground
+      end
+      object ppLblResumoCancelado: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblResumoCancelado'
+        Caption = 'Cancelado'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3048
+        mmLeft = 170180
+        mmTop = 9652
+        mmWidth = 19050
+        BandType = 7
+        LayerName = Foreground
+      end
+      object dbValorCancelado: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbValorCancelado'
+        DataField = 'VALOR_CANCELADO'
+        DataPipeline = FPipeResumo
+        DisplayFormat = '#,##0.00;-#,##0.00'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'Resumo'
+        mmHeight = 4572
+        mmLeft = 190500
+        mmTop = 8636
+        mmWidth = 26670
+        BandType = 7
+        LayerName = Foreground
+      end
+      object ppLblResumoTotal: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblResumoTotal'
+        Caption = 'Total'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 4210752
+        Font.Name = 'Arial'
+        Font.Size = 8
+        Font.Style = [fsBold]
+        Transparent = True
+        mmHeight = 3048
+        mmLeft = 223520
+        mmTop = 9652
+        mmWidth = 10160
+        BandType = 7
+        LayerName = Foreground
+      end
+      object dbValorTotal: TppDBText
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'dbValorTotal'
+        DataField = 'VALOR_TOTAL'
+        DataPipeline = FPipeResumo
+        DisplayFormat = '#,##0.00;-#,##0.00'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 9
+        Font.Style = [fsBold]
+        TextAlignment = taRightJustified
+        Transparent = True
+        DataPipelineName = 'Resumo'
+        mmHeight = 4572
+        mmLeft = 237490
+        mmTop = 8636
+        mmWidth = 26670
+        BandType = 7
+        LayerName = Foreground
+      end
+    end
+    object ppFooterBandFinanceiro: TppFooterBand
+      Background.Brush.Style = bsClear
+      mmBottomOffset = 0
+      mmHeight = 9144
+      mmPrintPosition = 0
+      object ppLineFooterFinanceiro: TppLine
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLineFooterFinanceiro'
+        Pen.Color = 14737632
+        mmHeight = 0
+        mmLeft = 0
+        mmTop = 1016
+        mmWidth = 267970
+        BandType = 8
+        LayerName = Foreground
+      end
+      object ppLblImpressoEm: TppLabel
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppLblImpressoEm'
+        Caption = 'Impresso em'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGray
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3048
+        mmLeft = 0
+        mmTop = 3810
+        mmWidth = 17780
+        BandType = 8
+        LayerName = Foreground
+      end
+      object ppPrintDateFinanceiro: TppSystemVariable
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppPrintDateFinanceiro'
+        VarType = vtPrintDateTime
+        DisplayFormat = 'dd/mm/yyyy hh:nn'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGray
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = []
+        Transparent = True
+        mmHeight = 3048
+        mmLeft = 19050
+        mmTop = 3810
+        mmWidth = 30480
+        BandType = 8
+        LayerName = Foreground
+      end
+      object ppPageDescFinanceiro: TppSystemVariable
+        DesignLayer = ppDesignLayerFinanceiro
+        UserName = 'ppPageDescFinanceiro'
+        VarType = vtPageSetDesc
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGray
+        Font.Name = 'Arial'
+        Font.Size = 7
+        Font.Style = []
+        TextAlignment = taRightJustified
+        Transparent = True
+        mmHeight = 3048
+        mmLeft = 237490
+        mmTop = 3810
+        mmWidth = 29210
+        BandType = 8
+        LayerName = Foreground
+      end
+    end
+    object ppDesignLayersFinanceiro: TppDesignLayers
+      object ppDesignLayerFinanceiro: TppDesignLayer
+        UserName = 'Foreground'
+        LayerType = ltBanded
+        Index = 0
+      end
+    end
+    object ppParameterListFinanceiro: TppParameterList
+    end
+  end
+end

@@ -1,0 +1,902 @@
+object frmRelatorioFinanceiro: TfrmRelatorioFinanceiro
+  Left = 0
+  Top = 0
+  Caption = 'Relatorio Financeiro'
+  ClientHeight = 385
+  ClientWidth = 820
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  OldCreateOrder = True
+  Position = poScreenCenter
+  PixelsPerInch = 96
+  TextHeight = 15
+  object FPnlTitulo: TPanel
+    Left = 0
+    Top = 0
+    Width = 820
+    Height = 58
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 0
+    object FLblTitulo: TLabel
+      Left = 24
+      Top = 16
+      Width = 154
+      Height = 21
+      Caption = 'Relatorio Financeiro'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+  end
+  object FPnlFiltros: TPanel
+    Left = 0
+    Top = 58
+    Width = 820
+    Height = 130
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 1
+    object FLblDataInicial: TLabel
+      Left = 24
+      Top = 8
+      Width = 58
+      Height = 15
+      Caption = 'Data inicial'
+    end
+    object FLblDataFinal: TLabel
+      Left = 160
+      Top = 8
+      Width = 50
+      Height = 15
+      Caption = 'Data final'
+    end
+    object FLblTipoData: TLabel
+      Left = 296
+      Top = 8
+      Width = 51
+      Height = 15
+      Caption = 'Filtrar por'
+    end
+    object FLblStatus: TLabel
+      Left = 456
+      Top = 8
+      Width = 32
+      Height = 15
+      Caption = 'Status'
+    end
+    object FLblCliente: TLabel
+      Left = 24
+      Top = 70
+      Width = 37
+      Height = 15
+      Caption = 'Cliente'
+    end
+    object FDtpInicial: TDateTimePicker
+      Left = 24
+      Top = 28
+      Width = 120
+      Height = 23
+      Date = 45000.000000000000000000
+      Time = 45000.000000000000000000
+      TabOrder = 0
+    end
+    object FDtpFinal: TDateTimePicker
+      Left = 160
+      Top = 28
+      Width = 120
+      Height = 23
+      Date = 45000.000000000000000000
+      Time = 45000.000000000000000000
+      TabOrder = 1
+    end
+    object FCbxTipoData: TComboBox
+      Left = 296
+      Top = 28
+      Width = 140
+      Height = 23
+      Style = csDropDownList
+      ItemIndex = 0
+      TabOrder = 2
+      Text = 'Vencimento'
+      Items.Strings = (
+        'Vencimento'
+        'Emissao')
+    end
+    object FCbxStatus: TComboBox
+      Left = 456
+      Top = 28
+      Width = 140
+      Height = 23
+      Style = csDropDownList
+      ItemIndex = 0
+      TabOrder = 3
+      Text = 'Todos'
+      Items.Strings = (
+        'Todos'
+        'Abertos'
+        'Fechados'
+        'Cancelados')
+    end
+    object FEdtCodCliente: TEdit
+      Left = 24
+      Top = 90
+      Width = 72
+      Height = 23
+      TabOrder = 4
+      OnKeyPress = edtCodClienteKeyPress
+    end
+    object FEdtNomeCliente: TEdit
+      Left = 104
+      Top = 90
+      Width = 492
+      Height = 23
+      TabOrder = 5
+      OnKeyPress = edtNomeClienteKeyPress
+    end
+  end
+  object FPnlBotoes: TPanel
+    Left = 0
+    Top = 188
+    Width = 820
+    Height = 54
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 2
+    object FBtnVisualizar: TButton
+      Left = 24
+      Top = 12
+      Width = 120
+      Height = 28
+      Caption = 'Visualizar'
+      Default = True
+      TabOrder = 0
+      OnClick = btnVisualizarClick
+    end
+    object FBtnSair: TButton
+      Left = 152
+      Top = 12
+      Width = 120
+      Height = 28
+      Cancel = True
+      Caption = 'Sair'
+      TabOrder = 1
+      OnClick = btnSairClick
+    end
+  end
+  object FConexaoFinanceiro: TFDConnection
+    Params.Strings = (
+      'DriverID=FB'
+      'Server=localhost'
+      'Port=3050'
+      'Database=C:\Projeto_Vendas\data\ERP_FINANCEIRO.FDB'
+      'User_Name=SYSDBA'
+      'Password=masterkey'
+      'CharacterSet=UTF8'
+      'Protocol=TCPIP')
+    Connected = True
+    LoginPrompt = False
+    BeforeConnect = FConexaoFinanceiroBeforeConnect
+    Left = 32
+    Top = 256
+  end
+  object FQryFinanceiro: TFDQuery
+    Active = True
+    Connection = FConexaoFinanceiro
+    SQL.Strings = (
+      'select cr.id_conta_receber, cr.id_origem, cr.id_cliente,'
+      '       cr.nome_cliente, cr.data_emissao, cr.data_vencimento,'
+      '       cr.valor as valor_financeiro, cr.status,'
+      '       case cr.status'
+      '         when '#39'ABERTA'#39' then '#39'Aberta'#39
+      '         when '#39'RECEBIDA'#39' then '#39'Fechada'#39
+      '         when '#39'CANCELADA'#39' then '#39'Cancelada'#39
+      '         else cr.status'
+      '       end as status_descricao'
+      'from contas_receber cr'
+      'where 1 = 0'
+      'order by cr.data_vencimento, cr.id_conta_receber')
+    Left = 136
+    Top = 256
+    object FQryFinanceiroID_CONTA_RECEBER: TIntegerField
+      FieldName = 'ID_CONTA_RECEBER'
+      Origin = 'ID_CONTA_RECEBER'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object FQryFinanceiroID_ORIGEM: TIntegerField
+      FieldName = 'ID_ORIGEM'
+      Origin = 'ID_ORIGEM'
+      Required = True
+    end
+    object FQryFinanceiroID_CLIENTE: TIntegerField
+      FieldName = 'ID_CLIENTE'
+      Origin = 'ID_CLIENTE'
+      Required = True
+    end
+    object FQryFinanceiroNOME_CLIENTE: TWideStringField
+      FieldName = 'NOME_CLIENTE'
+      Origin = 'NOME_CLIENTE'
+      Required = True
+      Size = 120
+    end
+    object FQryFinanceiroDATA_EMISSAO: TSQLTimeStampField
+      FieldName = 'DATA_EMISSAO'
+      Origin = 'DATA_EMISSAO'
+      Required = True
+    end
+    object FQryFinanceiroDATA_VENCIMENTO: TSQLTimeStampField
+      FieldName = 'DATA_VENCIMENTO'
+      Origin = 'DATA_VENCIMENTO'
+      Required = True
+    end
+    object FQryFinanceiroVALOR_FINANCEIRO: TBCDField
+      FieldName = 'VALOR_FINANCEIRO'
+      Origin = 'VALOR'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+    object FQryFinanceiroSTATUS: TWideStringField
+      FieldName = 'STATUS'
+      Origin = 'STATUS'
+      Required = True
+      Size = 30
+    end
+    object FQryFinanceiroSTATUS_DESCRICAO: TWideStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'STATUS_DESCRICAO'
+      Origin = 'STATUS_DESCRICAO'
+      ProviderFlags = []
+      ReadOnly = True
+      Size = 30
+    end
+  end
+  object FQryResumo: TFDQuery
+    Active = True
+    Connection = FConexaoFinanceiro
+    SQL.Strings = (
+      'select count(*) as qtd_contas,'
+      '       coalesce(sum(cr.valor), 0) as valor_total,'
+      
+        '       coalesce(sum(case when cr.status = '#39'ABERTA'#39' then cr.valor' +
+        ' else 0 end), 0) as valor_aberto,'
+      
+        '       coalesce(sum(case when cr.status = '#39'RECEBIDA'#39' then cr.val' +
+        'or else 0 end), 0) as valor_fechado,'
+      
+        '       coalesce(sum(case when cr.status = '#39'CANCELADA'#39' then cr.va' +
+        'lor else 0 end), 0) as valor_cancelado'
+      'from contas_receber cr'
+      'where 1 = 0')
+    Left = 136
+    Top = 304
+    object FQryResumoQTD_CONTAS: TLargeintField
+      AutoGenerateValue = arDefault
+      FieldName = 'QTD_CONTAS'
+      Origin = 'QTD_CONTAS'
+      ProviderFlags = []
+      ReadOnly = True
+    end
+    object FQryResumoVALOR_TOTAL: TBCDField
+      AutoGenerateValue = arDefault
+      FieldName = 'VALOR_TOTAL'
+      Origin = 'VALOR_TOTAL'
+      ProviderFlags = []
+      ReadOnly = True
+      Precision = 18
+      Size = 2
+    end
+    object FQryResumoVALOR_ABERTO: TBCDField
+      AutoGenerateValue = arDefault
+      FieldName = 'VALOR_ABERTO'
+      Origin = 'VALOR_ABERTO'
+      ProviderFlags = []
+      ReadOnly = True
+      Precision = 18
+      Size = 2
+    end
+    object FQryResumoVALOR_FECHADO: TBCDField
+      AutoGenerateValue = arDefault
+      FieldName = 'VALOR_FECHADO'
+      Origin = 'VALOR_FECHADO'
+      ProviderFlags = []
+      ReadOnly = True
+      Precision = 18
+      Size = 2
+    end
+    object FQryResumoVALOR_CANCELADO: TBCDField
+      AutoGenerateValue = arDefault
+      FieldName = 'VALOR_CANCELADO'
+      Origin = 'VALOR_CANCELADO'
+      ProviderFlags = []
+      ReadOnly = True
+      Precision = 18
+      Size = 2
+    end
+  end
+  object FDSFinanceiro: TDataSource
+    DataSet = FQryFinanceiro
+    Left = 248
+    Top = 256
+  end
+  object FDSResumo: TDataSource
+    DataSet = FQryResumo
+    Left = 248
+    Top = 304
+  end
+  object FPipeFinanceiro: TppDBPipeline
+    DataSource = FDSFinanceiro
+    UserName = 'Financeiro'
+    Left = 360
+    Top = 256
+    object FPipeFinanceiroppField1: TppField
+      Alignment = taRightJustify
+      FieldAlias = 'ID_CONTA_RECEBER'
+      FieldName = 'ID_CONTA_RECEBER'
+      FieldLength = 0
+      DataType = dtInteger
+      DisplayWidth = 0
+      Position = 0
+    end
+    object FPipeFinanceiroppField2: TppField
+      Alignment = taRightJustify
+      FieldAlias = 'ID_ORIGEM'
+      FieldName = 'ID_ORIGEM'
+      FieldLength = 0
+      DataType = dtInteger
+      DisplayWidth = 10
+      Position = 1
+    end
+    object FPipeFinanceiroppField3: TppField
+      Alignment = taRightJustify
+      FieldAlias = 'ID_CLIENTE'
+      FieldName = 'ID_CLIENTE'
+      FieldLength = 0
+      DataType = dtInteger
+      DisplayWidth = 10
+      Position = 2
+    end
+    object FPipeFinanceiroppField4: TppField
+      FieldAlias = 'NOME_CLIENTE'
+      FieldName = 'NOME_CLIENTE'
+      FieldLength = 120
+      DisplayWidth = 120
+      Position = 3
+    end
+    object FPipeFinanceiroppField5: TppField
+      FieldAlias = 'DATA_EMISSAO'
+      FieldName = 'DATA_EMISSAO'
+      FieldLength = 0
+      DataType = dtDateTime
+      DisplayWidth = 34
+      Position = 4
+    end
+    object FPipeFinanceiroppField6: TppField
+      FieldAlias = 'DATA_VENCIMENTO'
+      FieldName = 'DATA_VENCIMENTO'
+      FieldLength = 0
+      DataType = dtDateTime
+      DisplayWidth = 34
+      Position = 5
+    end
+    object FPipeFinanceiroppField7: TppField
+      Alignment = taRightJustify
+      FieldAlias = 'VALOR_FINANCEIRO'
+      FieldName = 'VALOR_FINANCEIRO'
+      FieldLength = 2
+      DataType = dtDouble
+      DisplayWidth = 19
+      Position = 6
+    end
+    object FPipeFinanceiroppField8: TppField
+      FieldAlias = 'STATUS'
+      FieldName = 'STATUS'
+      FieldLength = 30
+      DisplayWidth = 30
+      Position = 7
+    end
+    object FPipeFinanceiroppField9: TppField
+      FieldAlias = 'STATUS_DESCRICAO'
+      FieldName = 'STATUS_DESCRICAO'
+      FieldLength = 30
+      DisplayWidth = 30
+      Position = 8
+    end
+  end
+  object FPipeResumo: TppDBPipeline
+    DataSource = FDSResumo
+    UserName = 'Resumo'
+    Left = 360
+    Top = 304
+    object FPipeResumoppField1: TppField
+      FieldAlias = 'QTD_CONTAS'
+      FieldName = 'QTD_CONTAS'
+      FieldLength = 0
+      DataType = dtLargeInt
+      DisplayWidth = 0
+      Position = 0
+    end
+    object FPipeResumoppField2: TppField
+      Alignment = taRightJustify
+      FieldAlias = 'VALOR_TOTAL'
+      FieldName = 'VALOR_TOTAL'
+      FieldLength = 2
+      DataType = dtDouble
+      DisplayWidth = 19
+      Position = 1
+    end
+    object FPipeResumoppField3: TppField
+      Alignment = taRightJustify
+      FieldAlias = 'VALOR_ABERTO'
+      FieldName = 'VALOR_ABERTO'
+      FieldLength = 2
+      DataType = dtDouble
+      DisplayWidth = 19
+      Position = 2
+    end
+    object FPipeResumoppField4: TppField
+      Alignment = taRightJustify
+      FieldAlias = 'VALOR_FECHADO'
+      FieldName = 'VALOR_FECHADO'
+      FieldLength = 2
+      DataType = dtDouble
+      DisplayWidth = 19
+      Position = 3
+    end
+    object FPipeResumoppField5: TppField
+      Alignment = taRightJustify
+      FieldAlias = 'VALOR_CANCELADO'
+      FieldName = 'VALOR_CANCELADO'
+      FieldLength = 2
+      DataType = dtDouble
+      DisplayWidth = 19
+      Position = 4
+    end
+  end
+  object ppReport1: TppReport
+    AutoStop = False
+    DataPipeline = FPipeFinanceiro
+    PrinterSetup.BinName = 'Default'
+    PrinterSetup.DocumentName = 'Report'
+    PrinterSetup.Orientation = poLandscape
+    PrinterSetup.PaperName = 'Custom'
+    PrinterSetup.PrinterName = 'Default'
+    PrinterSetup.SaveDeviceSettings = False
+    PrinterSetup.mmMarginBottom = 6350
+    PrinterSetup.mmMarginLeft = 6350
+    PrinterSetup.mmMarginRight = 6350
+    PrinterSetup.mmMarginTop = 6350
+    PrinterSetup.mmPaperHeight = 7543815
+    PrinterSetup.mmPaperWidth = 5334011
+    PrinterSetup.PaperSize = 256
+    ArchiveFileName = '($MyDocuments)\ReportArchive.raf'
+    DeviceType = 'Screen'
+    DefaultFileDeviceType = 'PDF'
+    EmailSettings.ReportFormat = 'PDF'
+    EmailSettings.ConnectionSettings.MailService = 'SMTP'
+    EmailSettings.ConnectionSettings.WebMail.GmailSettings.OAuth2.AuthStorage = [oasAccessToken, oasRefreshToken, oasEncryptTokens]
+    EmailSettings.ConnectionSettings.WebMail.GmailSettings.OAuth2.RedirectURI = 'http://localhost'
+    EmailSettings.ConnectionSettings.WebMail.GmailSettings.OAuth2.RedirectPort = 0
+    EmailSettings.ConnectionSettings.WebMail.GmailSettings.OAuth2.RefreshTokenLifeSpan = 365
+    EmailSettings.ConnectionSettings.WebMail.Outlook365Settings.OAuth2.AuthStorage = [oasAccessToken, oasRefreshToken, oasEncryptTokens]
+    EmailSettings.ConnectionSettings.WebMail.Outlook365Settings.OAuth2.RedirectURI = 'http://localhost'
+    EmailSettings.ConnectionSettings.WebMail.Outlook365Settings.OAuth2.RedirectPort = 0
+    EmailSettings.ConnectionSettings.WebMail.Outlook365Settings.OAuth2.RefreshTokenLifeSpan = 365
+    EmailSettings.ConnectionSettings.EnableMultiPlugin = False
+    EmailSettings.ConnectionSettings.ConnectionStatusInfo = [csiStatusBar]
+    LanguageID = 'Default'
+    OpenFile = False
+    OutlineSettings.CreateNode = True
+    OutlineSettings.CreatePageNodes = True
+    OutlineSettings.Enabled = True
+    OutlineSettings.Visible = True
+    ThumbnailSettings.Enabled = True
+    ThumbnailSettings.Visible = True
+    ThumbnailSettings.DeadSpace = 30
+    ThumbnailSettings.PageHighlight.Width = 3
+    ThumbnailSettings.ThumbnailSize = tsSmall
+    PDFSettings.EmbedFontOptions = [efUseSubset]
+    PDFSettings.EncryptSettings.AllowCopy = True
+    PDFSettings.EncryptSettings.AllowInteract = True
+    PDFSettings.EncryptSettings.AllowModify = True
+    PDFSettings.EncryptSettings.AllowPrint = True
+    PDFSettings.EncryptSettings.AllowExtract = True
+    PDFSettings.EncryptSettings.AllowAssemble = True
+    PDFSettings.EncryptSettings.AllowQualityPrint = True
+    PDFSettings.EncryptSettings.Enabled = False
+    PDFSettings.EncryptSettings.KeyLength = kl40Bit
+    PDFSettings.EncryptSettings.EncryptionType = etRC4
+    PDFSettings.DigitalSignatureSettings.SignPDF = False
+    PDFSettings.FontEncoding = feAnsi
+    PDFSettings.ImageCompressionLevel = 25
+    PDFSettings.PDFAFormat = pafNone
+    PDFSettings.Layers = False
+    PDFSettings.Outline = False
+    PreviewFormSettings.PageBorder.mmPadding = 0
+    RTFSettings.AppName = 'ReportBuilder'
+    RTFSettings.Author = 'ReportBuilder'
+    RTFSettings.DefaultFont.Charset = DEFAULT_CHARSET
+    RTFSettings.DefaultFont.Color = clWindowText
+    RTFSettings.DefaultFont.Height = -13
+    RTFSettings.DefaultFont.Name = 'Arial'
+    RTFSettings.DefaultFont.Style = []
+    RTFSettings.Title = 'Report'
+    TextFileName = '($MyDocuments)\Report.pdf'
+    TextSearchSettings.DefaultString = '<FindText>'
+    TextSearchSettings.Enabled = True
+    XLSSettings.AppName = 'ReportBuilder'
+    XLSSettings.Author = 'ReportBuilder'
+    XLSSettings.Subject = 'Report'
+    XLSSettings.Title = 'Report'
+    XLSSettings.WorksheetName = 'Report'
+    Left = 480
+    Top = 304
+    Version = '23.03'
+    mmColumnWidth = 67300
+    DataPipelineName = 'FPipeFinanceiro'
+    object ppHeaderBand1: TppHeaderBand
+      Border.mmPadding = 0
+      mmBottomOffset = 0
+      mmHeight = 25665
+      mmPrintPosition = 0
+      object ppLabel1: TppLabel
+        DesignLayer = ppDesignLayer1
+        UserName = 'Label1'
+        Border.mmPadding = 0
+        Caption = 'Relatorio Financeiro'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Name = 'Arial'
+        Font.Size = 10
+        Font.Style = []
+        FormFieldSettings.FormSubmitInfo.SubmitMethod = fstPost
+        FormFieldSettings.FormFieldType = fftNone
+        Transparent = True
+        mmHeight = 4233
+        mmLeft = 119327
+        mmTop = 5292
+        mmWidth = 30427
+        BandType = 0
+        LayerName = Foreground1
+      end
+      object ppLabel2: TppLabel
+        DesignLayer = ppDesignLayer1
+        UserName = 'Label2'
+        AutoSize = False
+        Border.mmPadding = 0
+        Caption = 'ID_CLIENTE'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Name = 'Arial'
+        Font.Size = 12
+        Font.Style = []
+        FormFieldSettings.FormSubmitInfo.SubmitMethod = fstPost
+        FormFieldSettings.FormFieldType = fftNone
+        Transparent = True
+        mmHeight = 4763
+        mmLeft = 794
+        mmTop = 20372
+        mmWidth = 24871
+        BandType = 0
+        LayerName = Foreground1
+      end
+      object ppLabel3: TppLabel
+        DesignLayer = ppDesignLayer1
+        UserName = 'Label3'
+        AutoSize = False
+        Border.mmPadding = 0
+        Caption = 'NOME_CLIENTE'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Name = 'Arial'
+        Font.Size = 12
+        Font.Style = []
+        FormFieldSettings.FormSubmitInfo.SubmitMethod = fstPost
+        FormFieldSettings.FormFieldType = fftNone
+        Transparent = True
+        mmHeight = 4763
+        mmLeft = 35983
+        mmTop = 20373
+        mmWidth = 33338
+        BandType = 0
+        LayerName = Foreground1
+      end
+      object ppLabel4: TppLabel
+        DesignLayer = ppDesignLayer1
+        UserName = 'Label4'
+        AutoSize = False
+        Border.mmPadding = 0
+        Caption = 'VALOR_FINANCEIRO'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Name = 'Arial'
+        Font.Size = 12
+        Font.Style = []
+        FormFieldSettings.FormSubmitInfo.SubmitMethod = fstPost
+        FormFieldSettings.FormFieldType = fftNone
+        Transparent = True
+        mmHeight = 4763
+        mmLeft = 161396
+        mmTop = 20373
+        mmWidth = 42863
+        BandType = 0
+        LayerName = Foreground1
+      end
+    end
+    object ppDetailBand1: TppDetailBand
+      Border.mmPadding = 0
+      mmBottomOffset = 0
+      mmHeight = 13229
+      mmPrintPosition = 0
+      object ppDBText1: TppDBText
+        DesignLayer = ppDesignLayer1
+        UserName = 'DBText1'
+        Border.mmPadding = 0
+        DataField = 'ID_CLIENTE'
+        DataPipeline = FPipeFinanceiro
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Name = 'Arial'
+        Font.Size = 12
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'FPipeFinanceiro'
+        mmHeight = 4763
+        mmLeft = 794
+        mmTop = 0
+        mmWidth = 32808
+        BandType = 4
+        LayerName = Foreground1
+      end
+      object ppDBText2: TppDBText
+        DesignLayer = ppDesignLayer1
+        UserName = 'DBText2'
+        Border.mmPadding = 0
+        DataField = 'NOME_CLIENTE'
+        DataPipeline = FPipeFinanceiro
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Name = 'Arial'
+        Font.Size = 12
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'FPipeFinanceiro'
+        mmHeight = 4763
+        mmLeft = 34925
+        mmTop = 0
+        mmWidth = 127000
+        BandType = 4
+        LayerName = Foreground1
+      end
+      object ppDBText3: TppDBText
+        DesignLayer = ppDesignLayer1
+        UserName = 'DBText3'
+        Border.mmPadding = 0
+        DataField = 'VALOR_FINANCEIRO'
+        DataPipeline = FPipeFinanceiro
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Name = 'Arial'
+        Font.Size = 12
+        Font.Style = []
+        Transparent = True
+        DataPipelineName = 'FPipeFinanceiro'
+        mmHeight = 4763
+        mmLeft = 163248
+        mmTop = 0
+        mmWidth = 50800
+        BandType = 4
+        LayerName = Foreground1
+      end
+    end
+    object ppFooterBand1: TppFooterBand
+      Border.mmPadding = 0
+      mmBottomOffset = 0
+      mmHeight = 13229
+      mmPrintPosition = 0
+      object ppSubReport1: TppSubReport
+        DesignLayer = ppDesignLayer1
+        UserName = 'SubReport1'
+        ExpandAll = False
+        NewPrintJob = False
+        OutlineSettings.CreateNode = True
+        TraverseAllData = False
+        mmHeight = 5027
+        mmLeft = 0
+        mmTop = 3704
+        mmWidth = 5321311
+        BandType = 8
+        LayerName = Foreground1
+        mmBottomOffset = 0
+        mmOverFlowOffset = 0
+        mmStopPosition = 0
+        mmMinHeight = 0
+        object ppChildReport1: TppChildReport
+          PrinterSetup.BinName = 'Default'
+          PrinterSetup.DocumentName = 'Report'
+          PrinterSetup.Orientation = poLandscape
+          PrinterSetup.PaperName = 'Custom'
+          PrinterSetup.PrinterName = 'Default'
+          PrinterSetup.SaveDeviceSettings = False
+          PrinterSetup.mmMarginBottom = 6350
+          PrinterSetup.mmMarginLeft = 6350
+          PrinterSetup.mmMarginRight = 6350
+          PrinterSetup.mmMarginTop = 6350
+          PrinterSetup.mmPaperHeight = 7543815
+          PrinterSetup.mmPaperWidth = 5334011
+          PrinterSetup.PaperSize = 256
+          Version = '23.03'
+          mmColumnWidth = 0
+          object ppTitleBand1: TppTitleBand
+            Border.mmPadding = 0
+            mmBottomOffset = 0
+            mmHeight = 13229
+            mmPrintPosition = 0
+            object ppLabel5: TppLabel
+              DesignLayer = ppDesignLayer2
+              UserName = 'Label5'
+              AutoSize = False
+              Border.mmPadding = 0
+              Caption = 'VALOR_TOTAL'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Name = 'Arial'
+              Font.Size = 12
+              Font.Style = []
+              FormFieldSettings.FormSubmitInfo.SubmitMethod = fstPost
+              FormFieldSettings.FormFieldType = fftNone
+              Transparent = True
+              mmHeight = 4763
+              mmLeft = 3969
+              mmTop = 8202
+              mmWidth = 30956
+              BandType = 1
+              LayerName = Foreground2
+            end
+            object ppLabel6: TppLabel
+              DesignLayer = ppDesignLayer2
+              UserName = 'Label6'
+              AutoSize = False
+              Border.mmPadding = 0
+              Caption = 'VALOR_ABERTO'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Name = 'Arial'
+              Font.Size = 12
+              Font.Style = []
+              FormFieldSettings.FormSubmitInfo.SubmitMethod = fstPost
+              FormFieldSettings.FormFieldType = fftNone
+              Transparent = True
+              mmHeight = 4763
+              mmLeft = 44450
+              mmTop = 8467
+              mmWidth = 34925
+              BandType = 1
+              LayerName = Foreground2
+            end
+            object ppLabel7: TppLabel
+              DesignLayer = ppDesignLayer2
+              UserName = 'Label7'
+              AutoSize = False
+              Border.mmPadding = 0
+              Caption = 'QTD_CONTAS'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Name = 'Arial'
+              Font.Size = 12
+              Font.Style = []
+              FormFieldSettings.FormSubmitInfo.SubmitMethod = fstPost
+              FormFieldSettings.FormFieldType = fftNone
+              Transparent = True
+              mmHeight = 4763
+              mmLeft = 82550
+              mmTop = 8202
+              mmWidth = 29633
+              BandType = 1
+              LayerName = Foreground2
+            end
+          end
+          object ppDetailBand2: TppDetailBand
+            Border.mmPadding = 0
+            mmBottomOffset = 0
+            mmHeight = 13229
+            mmPrintPosition = 0
+            object ppDBText4: TppDBText
+              DesignLayer = ppDesignLayer2
+              UserName = 'DBText4'
+              Border.mmPadding = 0
+              DataField = 'VALOR_TOTAL'
+              DataPipeline = FPipeResumo
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Name = 'Arial'
+              Font.Size = 12
+              Font.Style = []
+              ParentDataPipeline = False
+              Transparent = True
+              DataPipelineName = 'FPipeResumo'
+              mmHeight = 4763
+              mmLeft = 3969
+              mmTop = 0
+              mmWidth = 30956
+              BandType = 4
+              LayerName = Foreground2
+            end
+            object ppDBText5: TppDBText
+              DesignLayer = ppDesignLayer2
+              UserName = 'DBText5'
+              Border.mmPadding = 0
+              DataField = 'VALOR_ABERTO'
+              DataPipeline = FPipeResumo
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Name = 'Arial'
+              Font.Size = 12
+              Font.Style = []
+              ParentDataPipeline = False
+              Transparent = True
+              DataPipelineName = 'FPipeResumo'
+              mmHeight = 4763
+              mmLeft = 44450
+              mmTop = -2
+              mmWidth = 34925
+              BandType = 4
+              LayerName = Foreground2
+            end
+            object ppDBText6: TppDBText
+              DesignLayer = ppDesignLayer2
+              UserName = 'DBText6'
+              Border.mmPadding = 0
+              DataField = 'QTD_CONTAS'
+              DataPipeline = FPipeResumo
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Name = 'Arial'
+              Font.Size = 12
+              Font.Style = []
+              ParentDataPipeline = False
+              Transparent = True
+              DataPipelineName = 'FPipeResumo'
+              mmHeight = 4763
+              mmLeft = 82550
+              mmTop = -2
+              mmWidth = 29633
+              BandType = 4
+              LayerName = Foreground2
+            end
+          end
+          object ppSummaryBand1: TppSummaryBand
+            Border.mmPadding = 0
+            mmBottomOffset = 0
+            mmHeight = 13229
+            mmPrintPosition = 0
+          end
+          object ppDesignLayers2: TppDesignLayers
+            object ppDesignLayer2: TppDesignLayer
+              UserName = 'Foreground2'
+              LayerType = ltBanded
+              Index = 0
+            end
+          end
+        end
+      end
+    end
+    object ppDesignLayers1: TppDesignLayers
+      object ppDesignLayer1: TppDesignLayer
+        UserName = 'Foreground1'
+        LayerType = ltBanded
+        Index = 0
+      end
+    end
+    object ppParameterList1: TppParameterList
+    end
+  end
+end
