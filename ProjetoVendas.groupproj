@@ -1,0 +1,24 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{56F85C4D-A7E6-49B8-A537-CB618784889D}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Vendas\ERPVendas.dproj"><Dependencies/></Projects>
+        <Projects Include="Financeiro\ERPFinanceiro.dproj"><Dependencies/></Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject><Default.Personality/></BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ERPVendas"><MSBuild Projects="Vendas\ERPVendas.dproj"/></Target>
+    <Target Name="ERPVendas:Clean"><MSBuild Projects="Vendas\ERPVendas.dproj" Targets="Clean"/></Target>
+    <Target Name="ERPVendas:Make"><MSBuild Projects="Vendas\ERPVendas.dproj" Targets="Make"/></Target>
+    <Target Name="ERPFinanceiro"><MSBuild Projects="Financeiro\ERPFinanceiro.dproj"/></Target>
+    <Target Name="ERPFinanceiro:Clean"><MSBuild Projects="Financeiro\ERPFinanceiro.dproj" Targets="Clean"/></Target>
+    <Target Name="ERPFinanceiro:Make"><MSBuild Projects="Financeiro\ERPFinanceiro.dproj" Targets="Make"/></Target>
+    <Target Name="Build"><CallTarget Targets="ERPVendas;ERPFinanceiro"/></Target>
+    <Target Name="Clean"><CallTarget Targets="ERPVendas:Clean;ERPFinanceiro:Clean"/></Target>
+    <Target Name="Make"><CallTarget Targets="ERPVendas:Make;ERPFinanceiro:Make"/></Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
